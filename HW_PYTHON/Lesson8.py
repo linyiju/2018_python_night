@@ -36,6 +36,21 @@ headers = {
 with request.urlopen(url,context=context) as response:
     data = response.read().decode("utf-8")
 
+# root = bs4.BeautifulSoup(data,"html.parser")
+
+#官方網站資料抓取
+# web = root.find_all(text="官方網站"))
+# print(web.string)
+
+#  劇情介紹
+# title = root.find("div","gray_infobox_inner")
+# print("劇情介紹：",title.text)
+# #將電影種類資料抓取下來
+# test = root.find_all("div","level_name")
+# for catagory in test[:2]:
+#     print("類型：",catagory.text,end="")
+
+
 with open("5644.txt","w",encoding ="utf-8") as file :
     root = bs4.BeautifulSoup(data,"html.parser")
     #找出電影名稱
@@ -44,3 +59,12 @@ with open("5644.txt","w",encoding ="utf-8") as file :
 
     file.write("電影名稱(中文):"+movie_zh[0].string+"\n")
     file.write("電影名稱(英文):"+movie_eg[0].string+"\n")
+    #  劇情介紹
+    title = root.find("div","gray_infobox_inner")
+    file.write("劇情介紹："+title.text+"\n")
+    # 將電影種類資料抓取下來
+    test = root.find_all("div","level_name")
+    for catagory in test[:2]:
+        file.write("類型："+catagory.text+"\n")
+
+
