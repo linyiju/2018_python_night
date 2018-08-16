@@ -27,6 +27,7 @@
 import urllib.request as request
 import bs4 #使用BeautifulSoup擷取目標文字
 import ssl
+# import re
 context = ssl._create_unverified_context()
 url = "https://movies.yahoo.com.tw/movieinfo_main.html/id=5644"
 headers = {
@@ -36,7 +37,16 @@ headers = {
 with request.urlopen(url,context=context) as response:
     data = response.read().decode("utf-8")
 
-# root = bs4.BeautifulSoup(data,"html.parser")
+root = bs4.BeautifulSoup(data,"html.parser")
+
+# # 電影演員資料
+# actors = root.find_all("div","actor_inner")
+# for actor in actors:
+#     if " br " in actor:
+#         new_actor = actor.replace("<br/>","\n")
+#         print(new_actor)
+#     else:
+#         print(actor)
 
 #官方網站資料抓取
 # web = root.find_all(text="官方網站"))
@@ -45,26 +55,27 @@ with request.urlopen(url,context=context) as response:
 #  劇情介紹
 # title = root.find("div","gray_infobox_inner")
 # print("劇情介紹：",title.text)
+
 # #將電影種類資料抓取下來
 # test = root.find_all("div","level_name")
 # for catagory in test[:2]:
-#     print("類型：",catagory.text,end="")
+#     print("類型：",catagory.text.strip())
 
 
-with open("5644.txt","w",encoding ="utf-8") as file :
-    root = bs4.BeautifulSoup(data,"html.parser")
-    #找出電影名稱
-    movie_zh = root.find_all("h1")
-    movie_eg = root.find_all("h3")
+# with open("5644.txt","w",encoding ="utf-8") as file :
+#     root = bs4.BeautifulSoup(data,"html.parser")
+#     #找出電影名稱
+#     movie_zh = root.find_all("h1")
+#     movie_eg = root.find_all("h3")
 
-    file.write("電影名稱(中文):"+movie_zh[0].string+"\n")
-    file.write("電影名稱(英文):"+movie_eg[0].string+"\n")
-    #  劇情介紹
-    title = root.find("div","gray_infobox_inner")
-    file.write("劇情介紹："+title.text+"\n")
-    # 將電影種類資料抓取下來
-    test = root.find_all("div","level_name")
-    for catagory in test[:2]:
-        file.write("類型："+catagory.text+"\n")
+#     file.write("電影名稱(中文):"+movie_zh[0].string+"\n")
+#     file.write("電影名稱(英文):"+movie_eg[0].string+"\n")
+#     #  劇情介紹
+#     title = root.find("div","gray_infobox_inner")
+#     file.write("劇情介紹："+"\n"+title.text.strip()+"\n")
+#     # 將電影種類資料抓取下來
+#     test = root.find_all("div","level_name")
+#     for catagory in test[:2]:
+#         file.write("類型："+catagory.text.strip()+"\n")
 
 
