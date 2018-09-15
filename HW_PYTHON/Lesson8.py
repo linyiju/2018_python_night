@@ -35,86 +35,103 @@ headers = {
     "user-agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
 }
 
-with request.urlopen(url,context=context) as response:
-    data = response.read().decode("utf-8")
+# with request.urlopen(url,context=context) as response:
+#     data = response.read().decode("utf-8")
 
-root = bs4.BeautifulSoup(data,"html.parser")
-# print(root)
+# all_page = bs4.BeautifulSoup(data,"html.parser")
+# page = all_page.find("div","movie_intro_info_r")
 
-#官方網站
-# web = root.find("a",{"href":"https://www.facebook.com/foxmovies.tw"})
-# print("官方網站:",web["href"])
+# #電影的名稱(中文、英文)
+# movie_zh = page.find("h1")
+# print("電影名稱(中文):",movie_zh.text)
 
-#電影演員資料1
-# actors = root.find_all("div","movie_intro_list")
-# print(actors)
+# movie_eg = page.find("h3")
+# print("電影名稱(中文):",movie_eg.text)
+
+# #電影種類資料
+# catagorys = page.find_all("div","level_name")
+# for catagory in catagorys :
+#     print("電影種類:",catagory.text.strip())
+
+# #上映日期、片長、發行公司、IMDb分數
+# datas = page.find_all("span")
+# for data in datas[:4]:
+#     print(data.text)
+
+# # 導演資料、電影演員資料2
+# movie_intro_list = page.find_all("div","movie_intro_list")
+# print("導演：",movie_intro_list[0].text.strip()) #導演資料
+# new_actors = str(movie_intro_list[1].text.strip()).replace("\n","")
+# print("演員：",new_actors) #演員資料
+
+
+# actors = root.find_all("div","actor_inner")
+# # print(actors)
 # for actor in actors:
-#     print("演員：",actor.text.strip().strip())
+#     print("主要演員：",end="")
+#     for child in actor.h2:
+#         if child.string!=None:
+#             print(child.string.strip().replace("\n",""),end="")
+#             # if  child.string!=None:
+#                 # print(child.string.strip().replace("\n",""),end="")
+#     print("\n")
 
+   
 
-# 電影演員資料2
-# actors = root("div","actor_inner")
-# for actor in actors:
-#     print("演員：",actor.text.strip())
-# print(soup.actors.get_text("\n","<br/>"))
-# new_actors = actors[actors.index("<br/>")] = "\n"
-# print(new_actors)
-# if "<br/>" in actors[0] :
-#     new_actors = actors.replace("<br/>","\n")
-#     print(new_actors)
-# print(actors)
+# #官方網站資料抓取
+# web = page.find("a",{"href":"https://www.facebook.com/foxmovies.tw"})
+# print("官方網站:"+web["href"]+"\n")
 
-# new_actors = re.sub('<br/>', '\n', acotrs)
-# print(new_actors)
-
-# new_actors = "<br/>".join("%s"% actor for actor in actors)
-# print(new_actors)
-
-# for actor in actors : 
-#     a = actor.replace('<br>','')
-#     print(a)
-# new_actors = str(actors)
-# new_actors = new_actors.replace("<br/>","\n")
-
-
-#官方網站資料抓取
-# web = root.find_all(text="官方網站"))
-# print(web.string)
-
-#  劇情介紹
-# title = root.find("div","gray_infobox_inner")
+# #  劇情介紹
+# title = all_page.find("div","gray_infobox_inner")
 # print("劇情介紹：",title.text)
 
-# #將電影種類資料抓取下來
-# test = root.find_all("div","level_name")
-# for catagory in test[:2]:
-#     print("類型：",catagory.text.strip())
+
+##  將爬到的資料寫入txt檔裡面
+
+def movie_info(url):
+    context = ssl._create_unverified_context()
+    headers = {
+    "user-agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
+    }  
+    with request.urlopen(url,context=context) as response:
+        data = response.read().decode("utf-8") 
+        all_page = bs4.BeautifulSoup(data,"html.parser")
+        page = all_page.find("div","movie_intro_info_r")
+        movie_zh = page.find("h1")
+        movie_zh = movie_zh.text
+    with open(movie_zh,"w",encoding ="utf-8") as file :
+
+        #電影的名稱(中文、英文)
+        movie_zh = page.find("h1")
+        file.write("電影名稱(中文):"+movie_zh.text+"\n")
+
+        movie_eg = page.find("h3")
+        file.write("電影名稱(英文):"+movie_eg.text+"\n")
+
+        #電影種類資料
+        catagorys = page.find_all("div","level_name")
+        for catagory in catagorys :
+            file.write("電影種類:"+catagory.text.strip()+"\n")
+
+        #上映日期、片長、發行公司、IMDb分數
+        datas = page.find_all("span")
+        for data in datas[:4]:
+            file.write(data.text+"\n")
+
+        # 導演資料、電影演員資料2
+        movie_intro_list = page.find_all("div","movie_intro_list")
+        file.write("導演："+movie_intro_list[0].text.strip()+"\n") #導演資料
+        new_actors = str(movie_intro_list[1].text.strip()).replace("\n","")
+        file.write("演員："+new_actors+"\n") #演員資料
+
+        #官方網站資料抓取
+        web = page.find("a",{"href":"https://www.facebook.com/foxmovies.tw"})
+        file.write("官方網站:"+web["href"]+"\n")
+
+        #  劇情介紹
+        title = all_page.find("div","gray_infobox_inner")
+        file.write("劇情介紹："+title.text+"\n")
 
 
-with open("5644.txt","w",encoding ="utf-8") as file :
-    root = bs4.BeautifulSoup(data,"html.parser")
-    #找出電影名稱
-    movie_zh = root.find_all("h1")
-    movie_eg = root.find_all("h3")
-    file.write("電影名稱(中文):"+movie_zh[0].string+"\n")
-    file.write("電影名稱(英文):"+movie_eg[0].string+"\n")
-    
-    #  劇情介紹
-    title = root.find("div","gray_infobox_inner")
-    file.write("劇情介紹："+"\n"+title.text.strip()+"\n")
-    
-    # 將電影種類資料抓取下來
-    test = root.find_all("div","level_name")
-    for catagory in test[:2]:
-        file.write("類型："+catagory.text.strip()+"\n")
-    
-    # 電影演員資料2
-    actors = root("div","actor_inner")
-    for actor in actors:
-        file.write("演員："+actor.text.strip()+"\n")
-    
-    #官方網站
-    web = root.find("a",{"href":"https://www.facebook.com/foxmovies.tw"})
-    file.write("官方網站:"+web["href"])
-
-
+movie_info("https://movies.yahoo.com.tw/movieinfo_main/%E9%A9%9A%E5%A5%874%E8%B6%85%E4%BA%BA-the-fantastic-four-5644")
